@@ -1,0 +1,8 @@
+{
+	"name": "Profundidad Ckan",
+	"description": "",
+	"image": "heroku/python",
+	"repository": "https://github.com/davidPalechor/profundidad_ckan",
+	"keywords": ["python", "django"],
+	"addons": ["heroku-postgresql"]
+}
