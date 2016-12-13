@@ -1,0 +1,129 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+	<meta charset="UTF-8">
+	<head>
+		<title>Ckan Client</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<link rel="stylesheet" type = "text/css" href="{% static 'profundidad_ckan/css/bootstrap.min.css'%}">
+    	<link rel="stylesheet" type = "text/css" href="{% static 'profundidad_ckan/css/bootstrap-theme.min.css'%}">
+    	<link rel="stylesheet" type = "text/css" href="{% static 'profundidad_ckan/css/estilos.css'%}">
+    	<script src="http://d3js.org/d3.v2.min.js?2.9.3"></script>
+	</head>
+
+		<style>
+
+	  .link {
+	    stroke: #aaa;
+	  }
+
+	  .node text {
+	  stroke:#333;
+	  cursos:pointer;
+	  }
+
+	  .node circle{
+	  stroke:#fff;
+	  stroke-width:3px;
+	  fill:#555;
+	  }
+
+	  </style>
+
+
+	<body>
+
+		<nav class="navbar navbar-inverse">
+		  <div class="container-fluid">
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="#">Logo</a>
+		    </div>
+		    <div class="collapse navbar-collapse" id="myNavbar">
+		      <ul class="nav navbar-nav">
+		        <li class="active"><a href="/">Inicio</a></li>
+		      </ul>
+		    </div>
+		  </div>
+		</nav>
+
+	<div class = 'container-fluid text center'>
+		<div class = 'row content'>
+			<div class = 'col-sm-4'>
+				<h1>Datasets obtenidos</h1>
+				{{tam}}
+				{%for res in out%}
+					{%for key, value in res.items%}
+						{%ifnotequal value 'uno'%}
+							<table class = 'table-hover'><tr><td> {{value}}</td></tr></table>
+						{%endifnotequal%}
+					{%endfor%}
+				{%endfor%}
+			</div>
+			<div class = 'col-md-6'>
+				<div id = 'enlaces' style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+			</div>
+		</div>
+	</div>
+
+	  <script>
+
+	  /*var width = 1020,
+	     height = 1200*/
+	     var width = 700,
+	     height = 1020
+
+	  var svg = d3.select("#enlaces").append("svg")
+	      .attr("width", width)
+	      .attr("height", height);
+
+	  var force = d3.layout.force()
+	      .gravity(.03)
+	      .distance(200)
+	      .charge(-100)
+	      .size([width, height]);
+
+	  d3.json("{%static '/profundidad_ckan/data.json'%}", function(json) {
+	  	//d3.json("data.json", function(json) {
+	    force
+	        .nodes(json.nodes)
+	        .links(json.links)
+	        .start();
+
+	    var link = svg.selectAll(".link")
+	        .data(json.links)
+	      .enter().append("line")
+	        .attr("class", "link")
+	      .style("stroke-width", function(d) { return Math.sqrt(d.weight); });
+
+	    var node = svg.selectAll(".node")
+	        .data(json.nodes)
+	      .enter().append("g")
+	        .attr("class", "node")
+	        .call(force.drag);
+
+	    node.append("circle")
+	        .attr("r","10");
+
+	    node.append("text")
+	        .attr("dx", 12)
+	        .attr("dy", ".35em")
+	        .text(function(d) { return d.name });
+
+	    force.on("tick", function() {
+	      link.attr("x1", function(d) { return d.source.x; })
+	          .attr("y1", function(d) { return d.source.y; })
+	          .attr("x2", function(d) { return d.target.x; })
+	          .attr("y2", function(d) { return d.target.y; });
+
+	      node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+	    });
+	  });
+
+	  </script>
+	</body>
+</html>
